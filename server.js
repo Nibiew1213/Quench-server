@@ -4,7 +4,7 @@ const express = require('express')
 const mongoose = require("mongoose");
 
 const app = express()
-const port = process.env.port || 3000
+const port = process.env.port || 8000
 
 const mongoConnectionStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@generalassembly.ljkj0.mongodb.net/?retryWrites=true&w=majority`;
 
