@@ -5,8 +5,14 @@ const mongoose = require("mongoose");
 
 const app = express()
 const port = process.env.port || 8000
-
 const mongoConnectionStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@generalassembly.ljkj0.mongodb.net/?retryWrites=true&w=majority`;
+
+app.use(express.urlencoded({extended: true}))
+app.use(express.json())
+
+app.use(cors({
+  origin: '*'
+}))
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
