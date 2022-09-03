@@ -3,19 +3,35 @@ const listingModel = require("../models/listings-model");
 const listingValidator = require("../joi-validators/listings");
 
 module.exports = {
-
     fetchListings: async (req, res) => {
-        let allListings = []
+        let allListings = [];
 
         try {
-            allListings = await listingModel.find()
+            allListings = await listingModel.find();
         } catch (error) {
-            console.log(error)
-            res.status(500).json({error: "unable to fetch listings"})
+            console.log(error);
+            res.status(500).json({ error: "unable to fetch listings" });
         }
 
-        return res.json(allListings)
+        return res.json(allListings);
+    },
 
+    showListing: async (req, res) => {
+        let listingId = req.params.listingId;
+
+        try {
+            const listing = await listingModel.findById(listingId);
+            
+            if (!listing) {
+                return res.status(404).json();
+            }
+
+            return res.json(listing)
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "unable to fetch listing" });
+        }
     },
 
     createListing: async (req, res) => {
@@ -115,5 +131,7 @@ module.exports = {
         return res.status(201).json();
     },
 
-
+    deleteListing: async (req, res) => {
+        res.send("deleted")
+    }
 };
