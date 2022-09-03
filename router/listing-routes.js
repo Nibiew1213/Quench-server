@@ -15,5 +15,9 @@ router.post('/', listingController.createListing)
 //edit listing
 router.put('/:listingId', listingController.editListing)
 
+//delete listing
+router.delete('/:listingId', listingController.deleteListing)
+
+
 
 module.exports = router

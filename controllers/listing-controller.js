@@ -21,13 +21,12 @@ module.exports = {
 
         try {
             const listing = await listingModel.findById(listingId);
-            
+
             if (!listing) {
                 return res.status(404).json();
             }
 
-            return res.json(listing)
-
+            return res.json(listing);
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: "unable to fetch listing" });
@@ -132,6 +131,15 @@ module.exports = {
     },
 
     deleteListing: async (req, res) => {
-        res.send("deleted")
-    }
+        try {
+            let listingId = req.params.listingId;
+
+            await listingModel.findByIdAndDelete(listingId);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: "failed to delete listing" });
+        }
+
+        return res.status(201).json();
+    },
 };
