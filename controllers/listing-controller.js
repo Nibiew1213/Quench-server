@@ -3,6 +3,21 @@ const listingModel = require("../models/listings-model");
 const listingValidator = require("../joi-validators/listings");
 
 module.exports = {
+
+    fetchListings: async (req, res) => {
+        let allListings = []
+
+        try {
+            allListings = await listingModel.find()
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({error: "unable to fetch listings"})
+        }
+
+        return res.json(allListings)
+
+    },
+
     createListing: async (req, res) => {
         // res.send("created listing")
 
@@ -99,4 +114,6 @@ module.exports = {
 
         return res.status(201).json();
     },
+
+
 };

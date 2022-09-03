@@ -4,11 +4,13 @@ const listingController = require('../controllers/listing-controller')
 const router = express.Router()
 
 
+router.get('/', listingController.fetchListings)
 
-//createListing Route
+//create listing
 router.post('/', listingController.createListing)
 
-router.patch('/:listingId', listingController.editListing)
+//edit listing
+router.put('/:listingId', listingController.editListing)
 
 
 module.exports = router
