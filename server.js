@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const listingRouter = require('./router/listing-routes')
 
 const app = express();
 const port = process.env.port || 8000;
@@ -16,6 +17,8 @@ app.use(
         origin: "*",
     })
 );
+
+app.use('/api/v1/listings', listingRouter)
 
 app.get("/", (req, res) => {
     res.send("Hello World! This is Project 3 server");
