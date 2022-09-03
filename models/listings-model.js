@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ListingSchema = new mongoose.Schema({
+const listingSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -31,3 +31,7 @@ const ListingSchema = new mongoose.Schema({
     },
     timestamps: true
 });
+
+const Listing = mongoose.model('Listing', listingSchema)
+
+module.exports = Listing
