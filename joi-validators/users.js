@@ -17,6 +17,11 @@ const validators = {
           "any.only": '"Passwords" must match',
         }),
       }),
+
+      loginValidator: Joi.object({
+        email: Joi.string().email().label("Email").required(),
+        password: Joi.string().label("Password").required(),
+      }),
 }
 
 module.exports = validators

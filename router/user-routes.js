@@ -3,8 +3,11 @@ const userController = require('../controllers/user-controller')
 
 const router = express.Router()
 
-//create beverage
+//create user
 router.post('/register', userController.registerUser)
+
+//login
+router.post('/login', userController.loginUser)
 
 
 

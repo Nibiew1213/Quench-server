@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const userModel = require("../models/users-model");
 
@@ -11,7 +12,10 @@ module.exports = {
         let errorObject = {};
 
         //validate user reggo values
-        const userValidationResults = userValidator.registerValidator.validate(req.body,{abortEarly: false,});
+        const userValidationResults = userValidator.registerValidator.validate(
+            req.body,
+            { abortEarly: false }
+        );
 
         //return joi validation error messages, if any
         if (userValidationResults.error) {
@@ -32,7 +36,6 @@ module.exports = {
                 email: validatedUserDetails.email,
             });
 
-
             if (duplicateEmail) {
                 return res
                     .status(409)
@@ -44,7 +47,10 @@ module.exports = {
         }
 
         //bcrypt
-        const registerHash = await bcrypt.hash(validatedUserDetails.password, 10)
+        const registerHash = await bcrypt.hash(
+            validatedUserDetails.password,
+            10
+        );
 
         //create user
         try {
@@ -60,5 +66,52 @@ module.exports = {
             console.log(error);
             return res.status(500).json({ error: "failed to create user" });
         }
+    },
+
+    loginUser: async (req, res) => {
+        // res.send("user logged in")
+
+        let errorObject = {};
+        let errMsg = "invalid email or password";
+
+        //validate user reggo values
+        const loginValidationResults = userValidator.loginValidator.validate(
+            req.body,
+            { abortEarly: false }
+        );
+
+        //return joi validation error messages, if any
+        if (loginValidationResults.error) {
+            const validationError = loginValidationResults.error.details;
+
+            validationError.forEach((error) => {
+                errorObject[error.context.key] = error.message;
+            });
+
+            return res.status(400).json(errorObject);
+        }
+
+        const loginValidated = loginValidationResults.value;
+
+        try {
+            let user = await userModel.findOne({ email: loginValidated.email });
+
+            if (!user) {
+                return res.status(400).json({ error: errMsg });
+            }
+
+            //generate JWT and return as response
+            const userData = {
+                email: user.email,
+                name: user.name,
+            };
+
+            const token = jwt.sign({
+                exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour
+                data: userData,
+            }, process.env.JWT_SECRET);
+
+            return res.json({token})
+        } catch (error) {}
     },
 };
