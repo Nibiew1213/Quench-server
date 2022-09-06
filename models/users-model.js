@@ -12,26 +12,28 @@ const userSchema = new mongoose.Schema(
             required: true,
         },
         email: {
-            type: Number,
+            type: String,
             required: true,
+            unique: true,
+            lowercase: true,
         },
         hash: {
-            type: Number,
+            type: String,
             required: true,
             default: 0,
         },
-        cart: [{
-            type: Schema.Types.ObjectId,
-            ref: "Beverage"
-        }],
+        cart: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Beverage",
+            },
+        ],
         role: {
             type: String,
             enum: ["admin", "user"],
             default: "user",
             required: true,
         },
-
-
     },
 
     { timestamps: true }
