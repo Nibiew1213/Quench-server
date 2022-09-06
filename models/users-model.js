@@ -24,9 +24,15 @@ const userSchema = new mongoose.Schema(
         },
         cart: [
             {
-                type: Schema.Types.ObjectId,
-                ref: "Beverage",
-            },
+                quantity: {
+                    type: Number,
+                    required: true
+                },
+                product: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Beverage",
+                },
+            }
         ],
         role: {
             type: String,

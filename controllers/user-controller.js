@@ -112,6 +112,15 @@ module.exports = {
             }, process.env.JWT_SECRET);
 
             return res.json({token})
-        } catch (error) {}
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ error: "failed to log user in" });
+        }
     },
+
+    userProfile: (req, res) => {
+
+        userId = req.params.userId
+        res.send(`you are viewing ${userId}'s profile`)
+    }
 };

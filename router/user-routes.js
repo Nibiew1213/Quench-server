@@ -9,8 +9,7 @@ router.post('/register', userController.registerUser)
 //login
 router.post('/login', userController.loginUser)
 
-
-
-
+//profile
+router.get('/profile/:userId', userController.userProfile)
 
 module.exports = router
