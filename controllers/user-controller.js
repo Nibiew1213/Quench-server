@@ -1,7 +1,8 @@
+const bcrypt = require('bcrypt')
+
 const userModel = require("../models/users-model");
 
 const userValidator = require("../joi-validators/users");
-const { beverageValidator } = require("../joi-validators/beverages");
 
 module.exports = {
     registerUser: async (req, res) => {
@@ -24,8 +25,8 @@ module.exports = {
         }
 
         let validatedUserDetails = userValidationResults.value;
-        console.log(validatedUserDetails)
-        //check for duplicate
+
+        //check for duplicate email
         try {
             let duplicateEmail = await userModel.findOne({
                 email: validatedUserDetails.email,
@@ -42,12 +43,16 @@ module.exports = {
             return res.status(500).json({ error: "failed to get user" });
         }
 
+        //bcrypt
+        const registerHash = await bcrypt.hash(validatedUserDetails.password, 10)
+
+        //create user
         try {
             await userModel.create({
                 fullName: validatedUserDetails.fullName,
                 preferredName: validatedUserDetails.preferredName,
                 email: validatedUserDetails.email,
-                hash: validatedUserDetails.password,
+                hash: registerHash,
             });
 
             return res.status(201).json({ success: "user created" });
