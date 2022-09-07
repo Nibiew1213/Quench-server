@@ -1,0 +1,44 @@
+const jwt = require("jsonwebtoken");
+
+//next present so that it runs the set of instructions/function on router
+module.exports = (req, res, next) => {
+    //get Auth header value, as seen on postman
+    const authHeader = req.header("Authorization");
+    console.log(authHeader);
+
+    //ask why this doesnt work
+    if (!authHeader) {
+        return res.status(401).json({
+            message: "Authentication details empty",
+        });
+    }
+
+    //check for "Bearer " in Auth Header
+    if (authHeader.slice(0, 7) !== "Bearer ") {
+        return res.status(401).json({
+            message: "Invalid auth type",
+        });
+    }
+
+    //get token value
+    const token = authHeader.slice(7);
+    if (token.length === 0) {
+        return res.status(401).json({
+            message: "Invalid auth token",
+        });
+    }
+
+    //set global var userAuth if JWT is valid
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(verified);
+
+    if (verified) {
+        res.locals.authUser = verified;
+        next();
+        return;
+    }
+
+    return res.status(401).json({
+        message: "Invalid auth token",
+    });
+};

@@ -106,21 +106,38 @@ module.exports = {
                 name: user.name,
             };
 
-            const token = jwt.sign({
-                exp: Math.floor(Date.now() / 1000) + (60 * 60), // 1 hour
-                data: userData,
-            }, process.env.JWT_SECRET);
+            const token = jwt.sign(
+                {
+                    exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
+                    data: userData,
+                },
+                process.env.JWT_SECRET
+            );
 
-            return res.json({token})
+            return res.json({ token });
         } catch (error) {
             console.log(error);
             return res.status(500).json({ error: "failed to log user in" });
         }
     },
 
-    userProfile: (req, res) => {
+    userProfile: async (req, res) => {
+        let authUser = res.locals.authUser;
+        let user = null;
 
-        userId = req.params.userId
-        res.send(`you are viewing ${userId}'s profile`)
-    }
+        //this is authMiddleware in action
+        if (!authUser) {
+            console.log("authUser: ", authUser);
+            return res.status(401).json();
+        }
+
+        try {
+            user = await userModel.findOne(authUser.data, "-__v -role -hash")
+            console.log("user: ", user)
+        } catch (error) {
+            return res.status(500).json({ error: "failed to get user" });
+        }
+
+        return res.json(user)
+    },
 };

@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema(
         hash: {
             type: String,
             required: true,
-            default: 0,
         },
         cart: [
             {
