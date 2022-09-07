@@ -1,20 +1,25 @@
-require('./config')
+const mongoose = require('mongoose');
+const Beverage = require('../models/beverages-model')
+const seedBeverage = require('./drinks/drinks.json')
+require("dotenv").config();
+const dbName = "quencher"
 
-
-const globAll = require("glob-all")
-
-const seed = async () => {
-  const requireAll = globAll.sync([
-    'seeds/**/*.js',
-    '!seeds/config.js',
-    '!seeds/seeds.js'
-  ]).map((filepath) => {
-    console.log('Seeding: ', filepath)
-    return require(`../${filepath}`)
+mongoose
+  .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_HOST}?retryWrites=true&w=majority`,{ useNewUrlParser: true, useUnifiedTopology: true,dbName: dbName  } )
+  .then(() => {
+    console.log('Mongo connection open!')
   })
+  .catch((err) => {
+    console.log(err);
+  });
 
-  await Promise.all(requireAll)
-  process.exit(1)
-}
+  const seedDB = async() => {
+    await Beverage.deleteMany({})
+    await Beverage.insertMany(seedBeverage)
+    console.log("Data Seeded")
+  };
 
-seed()
+  seedDB().then(() => {
+    mongoose.connection.close()
+  });
+
