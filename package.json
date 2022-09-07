@@ -26,6 +26,7 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "method-override": "^3.0.0",
-    "mongoose": "^6.5.3"
+    "mongoose": "^6.5.3",
+    "nodemon": "^2.0.19"
   }
 }
