@@ -5,7 +5,7 @@ require("dotenv").config();
 const dbName = "quencher"
 
 mongoose
-  .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_HOST}?retryWrites=true&w=majority`,{ useNewUrlParser: true, useUnifiedTopology: true,dbName: dbName  } )
+  .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_HOST}?retryWrites=true&w=majority`,{ dbName: dbName  } )
   .then(() => {
     console.log('Mongo connection open!')
   })
@@ -16,10 +16,11 @@ mongoose
   const seedDB = async() => {
     await Beverage.deleteMany({})
     await Beverage.insertMany(seedBeverage)
-    console.log("Data Seeded")
+    console.log("Data seeded!")
   };
 
   seedDB().then(() => {
     mongoose.connection.close()
+    console.log("Connection closed!")
   });
 
