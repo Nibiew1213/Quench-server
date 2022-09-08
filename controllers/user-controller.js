@@ -8,7 +8,7 @@ module.exports = {
         // do validations ...
         let errorObject = {}
 
-        const userValidationResults = userValidator.userValidator.validate(req.body, {
+        const userValidationResults = userValidator.registerValidator.validate(req.body, {
             abortEarly: false,
         })
 
@@ -51,6 +51,21 @@ module.exports = {
     
     login: async (req, res) => {
         // do validations ...
+        let errorObject = {}
+
+        const userValidationResults = userValidator.loginValidator.validate(req.body, {
+            abortEarly: false,
+        })
+
+        if (userValidationResults.error) {
+            const validationError = userValidationResults.error.details;
+
+            validationError.forEach((error) => {
+                errorObject[error.context.key] = error.message;
+            });
+
+            return res.status(400).json(errorObject);
+        }
 
         const validatedUser = req.body
         let errMsg = "user email or password is incorrect"
@@ -99,7 +114,7 @@ module.exports = {
         // }
 
         // return res.json(userData)
-
+        res.send("show route working")
         
              
     },

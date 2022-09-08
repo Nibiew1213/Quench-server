@@ -20,9 +20,11 @@ router.get('/profile/:userId', usersController.showUser)
 
 //edit user account
 router.put('/edit-user/:userId', usersController.editUser)
+//router.put('/profile/:userId/edit', usersController.editUser) ????
 
 //delete user account
 router.delete('/delete-user/:userId', usersController.deleteUser)
+//router.delete(/profile/:userId/delete', usersController.deleteUser) ???
 
 
 
