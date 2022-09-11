@@ -8,7 +8,6 @@ const userValidator = require("../joi-validators/users");
 module.exports = {
     registerUser: async (req, res) => {
         // res.send("user registered")
-
         let errorObject = {};
 
         //validate user reggo values
