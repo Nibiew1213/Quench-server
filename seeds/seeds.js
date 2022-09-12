@@ -16,10 +16,11 @@ mongoose
   const seedDB = async() => {
     await Beverage.deleteMany({})
     await Beverage.insertMany(seedBeverage)
-    console.log("Data Seeded")
+    console.log("Data seeded!")
   };
 
   seedDB().then(() => {
     mongoose.connection.close()
+    console.log("Connection closed!")
   });
 
