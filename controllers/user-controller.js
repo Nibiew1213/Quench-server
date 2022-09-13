@@ -1,14 +1,15 @@
 const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken")
 const userModel = require("../models/users-model")
-const userValidator = require("../joi-validators/users")
+const userValidator = require('../joi-validators/users')
 
 module.exports = {
   register: async (req, res) => {
     // do validations ...
     let errorObject = {}
 
-    const userValidationResults = userValidator.registerValidator.validate(req.body,{
+    const userValidationResults = userValidator.registerValidator.validate(
+      req.body,
+      {
         abortEarly: false,
       }
     )
@@ -51,63 +52,6 @@ module.exports = {
     }
   },
 
-  login: async (req, res) => {
-    // do validations ...
-    let errorObject = {}
-
-    const userValidationResults = userValidator.loginValidator.validate(
-      req.body,
-      {
-        abortEarly: false,
-      }
-    )
-
-    if (userValidationResults.error) {
-      const validationError = userValidationResults.error.details
-
-      validationError.forEach((error) => {
-        errorObject[error.context.key] = error.message
-      })
-
-      return res.status(400).json(errorObject)
-    }
-
-    const validatedUser = req.body
-    let errMsg = "user email or password is incorrect"
-    let user = null
-
-    try {
-      user = await userModel.findOne({ email: validatedUser.email })
-      if (!user) {
-        return res.status(401).json({ error: errMsg })
-      }
-    } catch (err) {
-      return res.status(500).json({ error: "failed to get user" })
-    }
-
-    const isPasswordOk = await bcrypt.compare(req.body.password, user.password)
-
-    if (!isPasswordOk) {
-      return res.status(401).json({ error: errMsg })
-    }
-
-    // generate JWT and return as response
-    const userData = {
-      fullName: user.fullName,
-      preferredName: user.preferredName,
-      email: user.email,
-    }
-    const token = jwt.sign(
-      {
-        exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
-        data: userData,
-      },
-      process.env.JWT_SECRET
-    )
-
-    return res.json({ token })
-  },
-
   showUser: async (req, res) => {
     let user = null
     let userAuth = res.locals.userAuth
@@ -147,118 +91,123 @@ module.exports = {
     //   return res.status(500).json({ error: "failed to update user" })
     // }
 
-    let errorObject = {};
+    let errorObject = {}
 
     //validate user values
-    const userValidationResults = userValidator.editValidator.validate(req.body, {
-            abortEarly: false,
-        })
+    const userValidationResults = userValidator.editValidator.validate(
+      req.body,
+      {
+        abortEarly: false,
+      }
+    )
 
     //return joi validation error messages, if any
     if (userValidationResults.error) {
-        const validationError = userValidationResults.error.details;
+      const validationError = userValidationResults.error.details
 
-        validationError.forEach((error) => {
-            errorObject[error.context.key] = error.message;
-        })
+      validationError.forEach((error) => {
+        errorObject[error.context.key] = error.message
+      })
 
-        return res.status(400).json(errorObject);
+      return res.status(400).json(errorObject)
     }
 
-    let userId = req.params._id;
-    let user = null;
+    let userId = req.params._id
+    let user = null
 
     try {
-        user = await userModel.findById(userId);
+      user = await userModel.findById(userId)
     } catch (error) {
-        return res
-            .status(500)
-            .json({ error: `Failed to get user of id: ${userId}` });
+      return res
+        .status(500)
+        .json({ error: `Failed to get user of id: ${userId}` })
     }
 
     if (!user) {
-        return res.status(404).json(user);
+      return res.status(404).json(user)
     }
 
     try {
-        await user.updateOne(req.body);
+      await user.updateOne(req.body)
     } catch (error) {
-        return res.status(500).json({ error: "failed to update user" });
+      return res.status(500).json({ error: "failed to update user" })
     }
 
-    return res.status(201).json({ message: "profile updated!"})
+    return res.status(201).json({ message: "profile updated!" })
   },
-  
 
   changePassword: async (req, res) => {
+    // do password joi validations
+    let errorObject = {}
 
-    // let errorObject = {}
+    const passwordValidationResults = userValidator.changePasswordValidator.validate(req.body, 
+        {
+            abortEarly: false,
+        })
 
-    // const passwordValidationResults = userValidator.changePasswordValidator.validate(req.body, {
-    //     abortEarly: false,
-    //   })
+    if (passwordValidationResults.error) {
+      const validationError = passwordValidationResults.error.details
 
-    // if (passwordValidationResults.error) {
-    //   const validationError = passwordValidationResults.error.details
+      validationError.forEach((error) => {
+        errorObject[error.context.key] = error.message
+      })
 
-    //   validationError.forEach((error) => {
-    //     errorObject[error.context.key] = error.message
-    //   })
-
-    //   return res.status(400).json(errorObject)
-    // }
-    // // expect req.body {currentpw, newPassword, confirmnewPass}
-    // // req.params.userId, check if user exists
-    // // retreive current password from db await find by id.password
-    // // check current password is correct as per the user in the database (bcryptcompare)
-    // const currentPassword = req.body
-    // let errMsg = "current password is incorrect"
-    // let oldPassword = null
-
-    // try {
-    //   oldPassword = await userModel.findById({ password: currentPassword.password })
-    //   if (!oldPassword) {
-    //     return res.status(401).json({ error: errMsg })
-    //   }
-    // } catch (err) {
-    //   return res.status(500).json({ error: "server error" })
-    // }
-
-    // const isPasswordOk = await bcrypt.compare(req.body.password, user.password)
-
-    // if (!isPasswordOk) {
-    //   return res.status(401).json({ error: errMsg })
-    // }
-    // try catch, if db password and req.body password matches,
-    // proceed to implement new password change
-    // if new password matches old password, return error " please enter new password"
-    // else check new password and confirm password is same. if not return error (new password and confirm password do not match)
-    // else hash new password then update in database
-  
-
+      return res.status(400).json(errorObject)
+    }
+    // req.params.userId, check if user exists
+    let userId = req.params._id
     try {
-        let userId = req.params._id
-        const passHash = await bcrypt.hash(req.body.password, 10) 
-        const updatePassword = { ...req.body, password: passHash }
+      const checkUser = await userModel.findById(userId)
 
-        await userModel.findByIdAndUpdate(userId, updatePassword)
-        
-        return res.status(201).json({ success: "password updated" })
-      } catch (err) {
-        console.log(err)
-        return res.status(500).json({ error: "failed to update password" })
+      if (!checkUser) {
+        res.status(404).json({ message: "User does not exists" })
       }
 
+      // retreive current password from db
+      // check current password is correct as per the user in the database (bcryptcompare)
+      const isPasswordOk = await bcrypt.compare(
+        req.body.currentPassword,
+        checkUser.password
+      )
+
+      if (!isPasswordOk) {
+        return res.status(401).json({ message: "Incorrect current password" })
+      }
+      // check new password and confirm password is same. if not return error (new password and confirm password do not match)
+      if (req.body.newPassword !== req.body.confirmNewPassword) {
+        return res.status(400).json({
+          message: "New password and confirm new password does not match",
+        })
+      }
+
+      // if db password and req.body password matches, return error "please enter new password"
+      const passHash = await bcrypt.hash(req.body.newPassword, 10)
+      const isPasswordSame = await bcrypt.compare(req.body.newPassword, checkUser.password)
+
+      if (isPasswordSame) {
+        return res.status(409).json({ message: "Please enter new password" })
+      }
+      // proceed to implement new password change, password then update in database
+      try {
+        await userModel.findByIdAndUpdate(userId, {
+          password: passHash
+        })
+        return res.status(201).json({ success: "password updated" })
+      } catch (err) {
+        return res.status(500).json({ error: "failed to update password" })
+      }
+    } catch (error) {
+      return res.status(500).json({ message: "Server Error" })
+    }
   },
 
   deleteUser: async (req, res) => {
     try {
-        let userId = req.params._id
-        await userModel.findByIdAndDelete(userId)
-        res.send("Profile deleted")
-    }  catch (error) {
-        return res.status(500).json({error: "failed to delete user"})
+      let userId = req.params._id
+      await userModel.findByIdAndDelete(userId)
+      res.status(200).json({ message: "Profile deleted" })
+    } catch (error) {
+      res.status(500).json({ error: "failed to delete user" })
     }
-    return res.status(200).json()
   },
 }
