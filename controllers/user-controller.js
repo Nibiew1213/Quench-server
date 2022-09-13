@@ -191,38 +191,58 @@ module.exports = {
   
 
   changePassword: async (req, res) => {
-    // expect req.body {currentpw, newPassword, confirmnewPass}
-    // req.params.userId, check if user exists
-    // retreive current password from db await find by id.password
-    // check current password is correct as per the user in the database (bcryptcompare)
-    const currentPassword = req.body
-    let errMsg = "current password is incorrect"
-    // let password = null
 
-    try {
-      password = await userModel.findOne({ password: currentPassword.password })
-      if (!password) {
-        return res.status(401).json({ error: errMsg })
-      }
-    } catch (err) {
-      return res.status(500).json({ error: "failed to get user" })
-    }
+    // let errorObject = {}
 
-    const isPasswordOk = await bcrypt.compare(req.body.password, user.password)
+    // const passwordValidationResults = userValidator.changePasswordValidator.validate(req.body, {
+    //     abortEarly: false,
+    //   })
 
-    if (!isPasswordOk) {
-      return res.status(401).json({ error: errMsg })
-    }
+    // if (passwordValidationResults.error) {
+    //   const validationError = passwordValidationResults.error.details
+
+    //   validationError.forEach((error) => {
+    //     errorObject[error.context.key] = error.message
+    //   })
+
+    //   return res.status(400).json(errorObject)
+    // }
+    // // expect req.body {currentpw, newPassword, confirmnewPass}
+    // // req.params.userId, check if user exists
+    // // retreive current password from db await find by id.password
+    // // check current password is correct as per the user in the database (bcryptcompare)
+    // const currentPassword = req.body
+    // let errMsg = "current password is incorrect"
+    // let oldPassword = null
+
+    // try {
+    //   oldPassword = await userModel.findById({ password: currentPassword.password })
+    //   if (!oldPassword) {
+    //     return res.status(401).json({ error: errMsg })
+    //   }
+    // } catch (err) {
+    //   return res.status(500).json({ error: "server error" })
+    // }
+
+    // const isPasswordOk = await bcrypt.compare(req.body.password, user.password)
+
+    // if (!isPasswordOk) {
+    //   return res.status(401).json({ error: errMsg })
+    // }
     // try catch, if db password and req.body password matches,
     // proceed to implement new password change
     // if new password matches old password, return error " please enter new password"
     // else check new password and confirm password is same. if not return error (new password and confirm password do not match)
     // else hash new password then update in database
-    const passHash = await bcrypt.hash(req.body.password, 10)
-    const updatePassword = { ...req.body, password: passHash }
+  
 
     try {
-        await userModel.updateOne(updatePassword)
+        let userId = req.params._id
+        const passHash = await bcrypt.hash(req.body.password, 10) 
+        const updatePassword = { ...req.body, password: passHash }
+
+        await userModel.findByIdAndUpdate(userId, updatePassword)
+        
         return res.status(201).json({ success: "password updated" })
       } catch (err) {
         console.log(err)
