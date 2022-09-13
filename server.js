@@ -37,5 +37,5 @@ app.listen(port, async () => {
         process.exit(1);
     }
 
-    console.log(`Example app listening on port ${port}`);
+    console.log(`Quencher app listening on port ${port}`);
 });

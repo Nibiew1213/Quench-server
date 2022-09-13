@@ -1,29 +1,28 @@
 const express = require('express')
 const usersController = require('../controllers/user-controller')
+const authMiddleware = require('../middlewares/authmiddleware')
 
 const router = express.Router()
 
-//display registration form
-router.get('/register', usersController.register)
-
 //create user account, save in database
-router.post('/register', usersController.register)
-
-//display login page
-router.get('/login', usersController.login)
+router.post('/auth/register', usersController.register)
 
 //login user account
-router.post('/login', usersController.login)
+router.post('/auth/login', usersController.login)
 
 //show user profile
-router.get('/profile/:userId', usersController.showUser)
+router.get('/profile/:_id', authMiddleware, usersController.showUser)
 
 //edit user account
-router.put('/edit-user/:userId', usersController.editUser)
-//router.put('/profile/:userId/edit', usersController.editUser) ????
+router.put('/profile/:_id/editProfile', usersController.editProfile)
+
+// declaring of route in server side requires react to call the correct endpoint
+// API endpoint and react URL is independent of each other.
+
+router.put('/profile/:_id/changePassword', usersController.changePassword)
 
 //delete user account
-router.delete('/delete-user/:userId', usersController.deleteUser)
+router.delete('/delete-user/:_id', usersController.deleteUser)
 //router.delete(/profile/:userId/delete', usersController.deleteUser) ???
 
 
