@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
         })
     }
 
-    // TODO: set global var userAuth if JWT is valid
+    // set global var userAuth if JWT is valid
     const verified = jwt.verify(token, process.env.JWT_SECRET)
         
     if (verified) {
