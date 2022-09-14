@@ -84,8 +84,8 @@ module.exports = {
     } catch (err) {
       return res.status(500).json({ error: "failed to get user" })
     }
-
-    const isPasswordOk = await bcrypt.compare(req.body.password, user.password)
+   
+    const isPasswordOk = await bcrypt.compare(req.body.password, user.passwordgit )
 
     if (!isPasswordOk) {
       return res.status(401).json({ error: errMsg })
