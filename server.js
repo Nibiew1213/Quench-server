@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const beverageRouter = require('./router/beverage-routes')
+const userRouter = require('./router/user-routes')
 
 const app = express();
 const port = process.env.port || 8000;
@@ -19,10 +20,12 @@ app.use(
 );
 
 app.use('/api/v1/beverages', beverageRouter)
+app.use('/api/v1/users', userRouter)
 
 app.get("/", (req, res) => {
     res.send("Hello World! This is Project 3 server");
 });
+
 
 app.listen(port, async () => {
     try {
@@ -34,5 +37,5 @@ app.listen(port, async () => {
         process.exit(1);
     }
 
-    console.log(`Example app listening on port ${port}`);
+    console.log(`Quencher app listening on port ${port}`);
 });
