@@ -23,8 +23,8 @@ const validators = {
         email: Joi.string().trim().email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } }).label("Email"),
     }),
 
-    changePasswordValidator: ({
-        password: Joi.string().min(4).label("Current Password").required(),
+    changePasswordValidator: Joi.object ({
+        currentPassword: Joi.string().min(4).label("Current Password").required(),
         newPassword: Joi.string().min(4).label("New Password").required(),
         confirmNewPassword: Joi.string().equal(Joi.ref("newPassword")).required()
         .label('Confirm new password')
