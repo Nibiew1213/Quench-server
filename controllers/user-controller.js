@@ -180,10 +180,21 @@ module.exports = {
   deleteUser: async (req, res) => {
     try {
       let userId = req.params._id
-      await userModel.findByIdAndDelete(userId)
+       
+      let userToDelete = await userModel.findByIdAndDelete(userId)
+
+      if (!userToDelete) {
+        return res.status(500).json({ error: "failed to delete user" })
+      }
+
       res.status(200).json({ message: "Profile deleted" })
     } catch (error) {
       res.status(500).json({ error: "failed to delete user" })
     }
   },
+
+
+  addToCart: async (req, res) => {
+    res.json(req.body)
+  }
 }

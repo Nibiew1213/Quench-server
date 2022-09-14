@@ -22,6 +22,8 @@ router.put('/profile/:_id/changePassword', authController.changePassword)
 
 // delete user account
 router.delete('/profile/:_id/deleteUser', usersController.deleteUser)
-//router.delete(/profile/:userId/delete', usersController.deleteUser) ???
+
+// add item to cart
+router.post('/profile/:id/addToCart', usersController.addToCart)
 
 module.exports = router
