@@ -24,6 +24,6 @@ router.put('/profile/:_id/changePassword', authController.changePassword)
 router.delete('/profile/:_id/deleteUser', usersController.deleteUser)
 
 // add item to cart
-router.post('/profile/:id/addToCart', usersController.addToCart)
+router.patch('/profile/:id/addToCart', usersController.addToCart)
 
 module.exports = router

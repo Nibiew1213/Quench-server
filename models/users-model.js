@@ -23,7 +23,8 @@ const usersSchema = new mongoose.Schema({
         {
             quantity: {
                 type: Number,
-                required: true
+                required: true,
+                min: [1, "must have at least 1"]
             },
             product: {
                 type: Schema.Types.ObjectId,
