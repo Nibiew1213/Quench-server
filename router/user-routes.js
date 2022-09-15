@@ -24,9 +24,12 @@ router.put('/profile/:_id/changePassword', authController.changePassword)
 router.delete('/profile/:_id/deleteUser', usersController.deleteUser)
 
 // add item to cart
-router.patch('/profile/:id/addToCart', usersController.addToCart)
+router.post('/:_id/cart', usersController.addToCart)
 
 // update to cart
-router.patch('/profile/:id/updateCart', usersController.updateCart)
+router.patch('/:_id/cart/lineItem/:lineItemId', usersController.updateCart)
+
+// remove from cart
+router.delete('/:_id/cart/lineItem/:lineItemId', usersController.removeFromCart)
 
 module.exports = router

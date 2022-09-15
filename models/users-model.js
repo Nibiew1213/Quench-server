@@ -19,19 +19,6 @@ const usersSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // cart: [
-    //     {
-    //         quantity: {
-    //             type: Number,
-    //             required: true,
-    //             min: [1, "must have at least 1"]
-    //         },
-    //         product: {
-    //             type: Schema.Types.ObjectId,
-    //             ref: "Beverage",
-    //         },
-    //     }
-    // ],
 
     cart: [
         {

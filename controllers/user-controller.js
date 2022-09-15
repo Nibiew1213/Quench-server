@@ -201,7 +201,7 @@ module.exports = {
     },
 
     addToCart: async (req, res) => {
-        const userId = req.params.id;
+        const userId = req.params._id;
         const beverageId = req.body.beverageId;
         const quantity = req.body.quantity;
 
@@ -212,10 +212,11 @@ module.exports = {
                 product: mongoose.Types.ObjectId(`${beverageId}`),
             })
 
+            //if exists, update quantity instead
             if(lineItemExists) {
                 await lineItemModel.findByIdAndUpdate(lineItemExists._id,{
                     $inc: {
-                        quantity: quantity
+                        quantity
                     }
                 })
 
@@ -227,7 +228,7 @@ module.exports = {
             let lineItem = await lineItemModel.create({
                 user: mongoose.Types.ObjectId(`${userId}`),
                 product: mongoose.Types.ObjectId(`${beverageId}`),
-                quantity: quantity,
+                quantity
             });
 
             //push line item to cart
@@ -244,46 +245,48 @@ module.exports = {
             return res.status(200).json({ message: "item added to cart" });
         } catch (error) {
             console.log(error);
-            return res
-                .status(500)
-                .json({ message: "unable to add item to cart!" });
+            return res.status(500).json({ message: "unable to add item to cart!" });
         }
     },
 
-    //editItem
-
+    //edit item in cart
     updateCart: async (req, res) => {
-        const userId = req.params.id;
+        const lineItemId = req.params.lineItemId
         const quantity = req.body.quantity;
-        const beverageId = req.body.beverageId;
 
-        // let beverageInCart = await userModel.find({
-        //     _id: mongoose.Types.ObjectId(`${userId}`),
-        //     "cart.product":  mongoose.Types.ObjectId(`${beverageId}`)
-        //     // "cart.product":  mongoose.Types.ObjectId(`6316bb48cc0184a97e1df869`)
-        // })
+        try {
+            await lineItemModel.findByIdAndUpdate(lineItemId, {
+                quantity
+            })
 
-        // if (beverageInCart) {
-        //     await userModel.find({"cart._id": ObjectId("6316bb48cc0184a97e1df869")})
-        // }
-
-        let lineItem = await lineItemModel.findByIdAndUpdate(
-            "6322de83ea7418a7bce2100c",
-            { quantity: quantity }
-        );
-
-        // let userCart = await Beverage.find(user: mongoose.Types.ObjectId()).populate([
-        //     {
-        //         path: "Beverage",
-        //         select: "name, brandName, price, spec, img",
-        //     },
-        // ]);
-
-        // console.log("lineItem: ", lineItem);
-        // console.log("userCart: ", userCart);
+            res.status(200).json({ message: "cart updated" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: "unable to update cart!" });
+        }
     },
 
-    //deleteItem
+    //remove from cart
+    removeFromCart: async (req, res) => {
+        const userId = req.params._id;
+        const lineItemId = req.params.lineItemId
+
+        try {
+            //remove from lineItem collection
+            await lineItemModel.findByIdAndDelete(lineItemId)
+
+            //remove lineItemId from cart array
+            await userModel.findByIdAndUpdate(userId, {
+                $pull: {
+                    cart: mongoose.Types.ObjectId(`${lineItemId}`)
+                }
+            }) 
+            res.status(200).json({ message: "Item removed from cart!" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: "unable remove item from cart!" });
+        }
+    },
 
     //show cart
     //await findbyid(userid).populate({path: 'cart'})
