@@ -289,5 +289,10 @@ module.exports = {
     },
 
     //show cart
+    showCart: async (req, res) => {
+        res.send("wow this is ur whole cart")
+    },
+
+
     //await findbyid(userid).populate({path: 'cart'})
 };

@@ -32,4 +32,7 @@ router.patch('/:_id/cart/lineItem/:lineItemId', usersController.updateCart)
 // remove from cart
 router.delete('/:_id/cart/lineItem/:lineItemId', usersController.removeFromCart)
 
+// show cart
+router.get('/:_id/cart', usersController.showCart)
+
 module.exports = router
