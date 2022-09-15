@@ -202,12 +202,29 @@ module.exports = {
 
     addToCart: async (req, res) => {
         const userId = req.params.id;
-        const quantity = req.body.quantity;
         const beverageId = req.body.beverageId;
+        const quantity = req.body.quantity;
 
         try {
+            //check if line item already exists
+            let lineItemExists = await lineItemModel.findOne({
+                user: mongoose.Types.ObjectId(`${userId}`),
+                product: mongoose.Types.ObjectId(`${beverageId}`),
+            })
+
+            if(lineItemExists) {
+                await lineItemModel.findByIdAndUpdate(lineItemExists._id,{
+                    $inc: {
+                        quantity: quantity
+                    }
+                })
+
+                return res.status(200).json({ message: "item added to cart" });
+            }
+
+
             //create line item
-            const lineItem = await lineItemModel.create({
+            let lineItem = await lineItemModel.create({
                 user: mongoose.Types.ObjectId(`${userId}`),
                 product: mongoose.Types.ObjectId(`${beverageId}`),
                 quantity: quantity,
@@ -226,31 +243,11 @@ module.exports = {
 
             return res.status(200).json({ message: "item added to cart" });
         } catch (error) {
-            consol.log(error);
+            console.log(error);
             return res
                 .status(500)
                 .json({ message: "unable to add item to cart!" });
         }
-
-        // try {
-        //     let user = await userModel.findByIdAndUpdate(userId, {
-        //         //add items into array
-        //         $push: {
-        //             cart: {
-        //                 quantity,
-        //                 product: mongoose.Types.ObjectId(`${beverageId}`)
-        //             }
-        //         }
-        //     });
-
-        //     if (!user) {
-        //         return res.status(404).json({ message: "user not found" });
-        //     }
-
-        //     return res.status(200).json({message: "item added to cart"})
-        // } catch (error) {
-        //     return res.status(500).json({message: "unable to add item to cart!"})
-        // }
     },
 
     //editItem
