@@ -1,8 +1,9 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../models/users-model");
 const userValidator = require("../joi-validators/users");
+const lineItemModel = require("../models/lineItems-model");
 const mongoose = require("mongoose");
-
+const Beverage = require("../models/beverages-model");
 
 module.exports = {
     register: async (req, res) => {
@@ -200,53 +201,93 @@ module.exports = {
     },
 
     addToCart: async (req, res) => {
-
         const userId = req.params.id;
-        const quantity = req.body.quantity
-        const beverageId = req.body.beverageId
+        const quantity = req.body.quantity;
+        const beverageId = req.body.beverageId;
 
         try {
-            let user = await userModel.findByIdAndUpdate(userId, {
-                //add items into array
+            //create line item
+            const lineItem = await lineItemModel.create({
+                user: mongoose.Types.ObjectId(`${userId}`),
+                product: mongoose.Types.ObjectId(`${beverageId}`),
+                quantity: quantity,
+            });
+
+            //push line item to cart
+            const user = await userModel.findByIdAndUpdate(userId, {
                 $push: {
-                    cart: {
-                        quantity,
-                        product: mongoose.Types.ObjectId(`${beverageId}`)
-                    }
-                }
+                    cart: lineItem._id,
+                },
             });
 
             if (!user) {
                 return res.status(404).json({ message: "user not found" });
             }
 
-            return res.status(200).json({message: "item added to cart"})
+            return res.status(200).json({ message: "item added to cart" });
         } catch (error) {
-            return res.status(500).json({message: "unable to add item to cart!"})
+            consol.log(error);
+            return res
+                .status(500)
+                .json({ message: "unable to add item to cart!" });
         }
+
+        // try {
+        //     let user = await userModel.findByIdAndUpdate(userId, {
+        //         //add items into array
+        //         $push: {
+        //             cart: {
+        //                 quantity,
+        //                 product: mongoose.Types.ObjectId(`${beverageId}`)
+        //             }
+        //         }
+        //     });
+
+        //     if (!user) {
+        //         return res.status(404).json({ message: "user not found" });
+        //     }
+
+        //     return res.status(200).json({message: "item added to cart"})
+        // } catch (error) {
+        //     return res.status(500).json({message: "unable to add item to cart!"})
+        // }
     },
 
     //editItem
 
     updateCart: async (req, res) => {
-
-        // const userId = req.params.id;
-        // const quantity = req.body.quantity
-        // const beverageId = req.body.beverageId
+        const userId = req.params.id;
+        const quantity = req.body.quantity;
+        const beverageId = req.body.beverageId;
 
         // let beverageInCart = await userModel.find({
         //     _id: mongoose.Types.ObjectId(`${userId}`),
         //     "cart.product":  mongoose.Types.ObjectId(`${beverageId}`)
         //     // "cart.product":  mongoose.Types.ObjectId(`6316bb48cc0184a97e1df869`)
         // })
-    
+
         // if (beverageInCart) {
-        //     await userModel.findByIdAndUpdate
+        //     await userModel.find({"cart._id": ObjectId("6316bb48cc0184a97e1df869")})
         // }
-        
+
+        let lineItem = await lineItemModel.findByIdAndUpdate(
+            "6322de83ea7418a7bce2100c",
+            { quantity: quantity }
+        );
+
+        // let userCart = await Beverage.find(user: mongoose.Types.ObjectId()).populate([
+        //     {
+        //         path: "Beverage",
+        //         select: "name, brandName, price, spec, img",
+        //     },
+        // ]);
+
+        // console.log("lineItem: ", lineItem);
+        // console.log("userCart: ", userCart);
     },
 
-
-
     //deleteItem
+
+    //show cart
+    //await findbyid(userid).populate({path: 'cart'})
 };

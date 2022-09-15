@@ -26,4 +26,7 @@ router.delete('/profile/:_id/deleteUser', usersController.deleteUser)
 // add item to cart
 router.patch('/profile/:id/addToCart', usersController.addToCart)
 
+// update to cart
+router.patch('/profile/:id/updateCart', usersController.updateCart)
+
 module.exports = router
