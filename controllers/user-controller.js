@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../models/users-model");
 const userValidator = require("../joi-validators/users");
+const cartValidator = require("../joi-validators/cart")
 const lineItemModel = require("../models/lineItems-model");
 const mongoose = require("mongoose");
 const Beverage = require("../models/beverages-model");
@@ -206,6 +207,26 @@ module.exports = {
         const quantity = req.body.quantity;
 
         try {
+            //validation
+            let errorObject = {};
+
+            const lineItemValidationResults = cartValidator.addToCartValidator.validate(
+                req.body,
+                {
+                    abortEarly: false,
+                }
+            );
+
+            if (lineItemValidationResults.error) {
+                const validationError = lineItemValidationResults.error.details;
+
+                validationError.forEach((error) => {
+                    errorObject[error.context.key] = error.message;
+                });
+
+                return res.status(400).json(errorObject);
+            }
+
             //check if line item already exists
             let lineItemExists = await lineItemModel.findOne({
                 user: mongoose.Types.ObjectId(`${userId}`),
@@ -254,10 +275,34 @@ module.exports = {
         const lineItemId = req.params.lineItemId
         const quantity = req.body.quantity;
 
+        //validation
+        let errorObject = {};
+
+            const lineItemValidationResults = cartValidator.updateCartValidator.validate(
+                req.body,
+                {
+                    abortEarly: false,
+                }
+            );
+
+            if (lineItemValidationResults.error) {
+                const validationError = lineItemValidationResults.error.details;
+
+                validationError.forEach((error) => {
+                    errorObject[error.context.key] = error.message;
+                });
+
+                return res.status(400).json(errorObject);
+            }
+
         try {
-            await lineItemModel.findByIdAndUpdate(lineItemId, {
+            const updateCart = await lineItemModel.findByIdAndUpdate(lineItemId, {
                 quantity
             })
+
+            if (!updateCart) {
+                return res.status(404).json({message: "line item not found"})
+            }
 
             res.status(200).json({ message: "cart updated" });
         } catch (error) {
@@ -273,7 +318,11 @@ module.exports = {
 
         try {
             //remove from lineItem collection
-            await lineItemModel.findByIdAndDelete(lineItemId)
+            const lineItemToDelete = await lineItemModel.findByIdAndDelete(lineItemId)
+
+            if(!lineItemToDelete) {
+                return res.status(404).json({message: "line item not found"})
+            }
 
             //remove lineItemId from cart array
             await userModel.findByIdAndUpdate(userId, {
