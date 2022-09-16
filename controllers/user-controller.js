@@ -89,7 +89,7 @@ module.exports = {
 
         const isPasswordOk = await bcrypt.compare(
             req.body.password,
-            user.passwordgit
+            user.password
         );
 
         if (!isPasswordOk) {
@@ -343,7 +343,7 @@ module.exports = {
 
         const userCart = await userModel.findById(userId, "-__v -userType -password").populate([{
             path: "cart",
-            select: ['_id'],
+            select: ['_id', 'quantity'],
             populate: {
                 path: 'product',
                 select: ['name', 'brandName', 'price', 'stock', 'spec', 'img']
