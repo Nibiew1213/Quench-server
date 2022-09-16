@@ -339,7 +339,19 @@ module.exports = {
 
     //show cart
     showCart: async (req, res) => {
-        res.send("wow this is ur whole cart")
+        const userId = req.params._id;
+
+        const userCart = await userModel.findById(userId, "-__v -userType -password").populate([{
+            path: "cart",
+            select: ['_id'],
+            populate: {
+                path: 'product',
+                select: ['name', 'brandName', 'price', 'stock', 'spec', 'img']
+            }
+        }])
+
+        res.send(userCart)
+        console.log(userCart)
     },
 
 
