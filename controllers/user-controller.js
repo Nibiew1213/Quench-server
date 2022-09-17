@@ -162,7 +162,7 @@ module.exports = {
             return res.status(400).json(errorObject);
         }
 
-        let userId = req.params._id;
+        let userId = req.params.userId;
         let user = null;
 
         try {
@@ -187,7 +187,7 @@ module.exports = {
 
     deleteUser: async (req, res) => {
         try {
-            let userId = req.params._id;
+            let userId = req.params.userId;
 
             let userToDelete = await userModel.findByIdAndDelete(userId);
 
@@ -202,7 +202,7 @@ module.exports = {
     },
 
     addToCart: async (req, res) => {
-        const userId = req.params._id;
+        const userId = req.params.userId;
         const beverageId = req.body.beverageId;
         const quantity = req.body.quantity;
 
@@ -313,7 +313,7 @@ module.exports = {
 
     //remove from cart
     removeFromCart: async (req, res) => {
-        const userId = req.params._id;
+        const userId = req.params.userId;
         const lineItemId = req.params.lineItemId
 
         try {
@@ -339,7 +339,7 @@ module.exports = {
 
     //show cart
     showCart: async (req, res) => {
-        const userId = req.params._id;
+        const userId = req.params.userId;
 
         const userCart = await userModel.findById(userId, "-__v -userType -password").populate([{
             path: "cart",
@@ -350,7 +350,7 @@ module.exports = {
             }
         }])
 
-        res.send(userCart)
+        res.status(200).json(userCart)
         console.log(userCart)
     },
 

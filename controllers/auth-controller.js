@@ -59,7 +59,7 @@ module.exports = {
 
 
 
-    return res.json({ token })
+    return res.json({ token, userData })
   },
 
   changePassword: async (req, res) => {
@@ -81,7 +81,7 @@ module.exports = {
       return res.status(400).json(errorObject)
     }
     // check if user exists in database
-    let userId = req.params._id
+    let userId = req.params.userId
     try {
       const checkUser = await userModel.findById(userId)
 
