@@ -354,7 +354,7 @@ module.exports = {
 
         const userCart = await userModel.findById(userId, "-__v -userType -password").populate([{
             path: "cart",
-            select: ['_id', 'quantity'],
+            select: ['_id', 'quantity', 'totalSum'],
             populate: {
                 path: 'product',
                 select: ['name', 'brandName', 'price', 'stock', 'spec', 'img']
