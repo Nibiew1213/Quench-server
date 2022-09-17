@@ -16,14 +16,7 @@ const LineItemSchema = new mongoose.Schema(
             required: true,
             min: [1, "must have at least 1"]
         },
-        totalSum: {
-            type: Number,
-            required: true,
-            min: [1, "must have at least 1"]
-        },
-    
-
-        
+  
     },
 
     { timestamps: true }

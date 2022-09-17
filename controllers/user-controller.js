@@ -231,9 +231,6 @@ module.exports = {
             let lineItemExists = await lineItemModel.findOne({
                 user: mongoose.Types.ObjectId(`${userId}`),
                 product: mongoose.Types.ObjectId(`${beverageId}`),
-            }).populate({
-                path: 'product',
-                select: ['price']
             })
 
             //if exists, update quantity instead
@@ -242,7 +239,6 @@ module.exports = {
                     $inc: {
                         quantity,
                     },
-                    totalSum: (lineItemExists.quantity + 1) * lineItemExists.product.price
                 })
 
                 return res.status(200).json({ message: "item added to cart" });
@@ -301,18 +297,14 @@ module.exports = {
 
         try {
             //populate with product price
-            const populateLineItem = await lineItemModel.findById(lineItemId).populate({
-                path: 'product',
-                select: ['price']
-            })
+            const lineItem = await lineItemModel.findById(lineItemId)
 
-            if(!populateLineItem) {
+            if(!lineItem) {
                 return res.status(404).json({message: "line item not found"})
             }
 
-            await lineItemModel.findByIdAndUpdate(populateLineItem, {
+            await lineItemModel.findByIdAndUpdate(lineItem, {
                 quantity,
-                totalSum: quantity * populateLineItem.product.price
             })
 
             res.status(200).json({ message: "cart updated" });
