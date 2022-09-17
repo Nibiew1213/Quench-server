@@ -19,8 +19,8 @@ app.use(
     })
 );
 
-app.use('/api/v1/beverages', beverageRouter)
-app.use('/api/v1/users', userRouter)
+app.use('/api/v1/beverages/', beverageRouter)
+app.use('/api/v1/users/', userRouter)
 
 app.get("/", (req, res) => {
     res.send("Hello World! This is Project 3 server");

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { Schema } = mongoose;
 
 const usersSchema = new mongoose.Schema({
     fullName: {
@@ -18,6 +19,13 @@ const usersSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    cart: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "LineItem",
+        }
+    ],
     userType: {
         type: String,
         enum : ['user','admin'],
