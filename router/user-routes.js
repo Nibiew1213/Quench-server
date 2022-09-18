@@ -1,6 +1,8 @@
 const express = require('express')
-const usersController = require('../controllers/user-controller')
 const authController = require('../controllers/auth-controller')
+const cartController = require('../controllers/cart-controller')
+const usersController = require('../controllers/user-controller')
+
 const authMiddleware = require('../middlewares/authmiddleware')
 
 const router = express.Router()
@@ -24,19 +26,19 @@ router.put('/profile/:userId/changePassword', authController.changePassword)
 router.delete('/profile/:userId/deleteUser', usersController.deleteUser)
 
 // add item to cart
-router.post('/:userId/cart', usersController.addToCart)
+router.post('/:userId/cart', cartController.addToCart)
 
 // update to cart
-router.patch('/:userId/cart/lineItem/:lineItemId', usersController.updateCart)
+router.patch('/:userId/cart/lineItem/:lineItemId', cartController.updateCart)
 
 // remove from cart
-router.delete('/:userId/cart/lineItem/:lineItemId', usersController.removeFromCart)
+router.delete('/:userId/cart/lineItem/:lineItemId', cartController.removeFromCart)
 
 // show cart
-router.get('/:userId/cart', usersController.showCart)
+router.get('/:userId/cart', cartController.showCart)
 
 // purchase items
-router.post('/:userId/cart/purchase', usersController.purchase)
+router.post('/:userId/cart/purchase', cartController.purchase)
 
 
 module.exports = router
