@@ -33,6 +33,8 @@ module.exports = {
       if (!user) {
         return res.status(401).json({ error: errMsg })
       }
+
+      console.log(user)
     } catch (err) {
       return res.status(500).json({ error: "failed to get user" })
     }
@@ -48,6 +50,7 @@ module.exports = {
       fullName: user.fullName,
       preferredName: user.preferredName,
       email: user.email,
+      userId: user._id
     }
     const token = jwt.sign(
       {
