@@ -20,12 +20,12 @@ const usersSchema = new mongoose.Schema({
         required: true
     },
 
-    cart: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "LineItem",
-        }
-    ],
+    // cart: [
+    //     {
+    //         type: Schema.Types.ObjectId,
+    //         ref: "LineItem",
+    //     }
+    // ],
     userType: {
         type: String,
         enum : ['user','admin'],
