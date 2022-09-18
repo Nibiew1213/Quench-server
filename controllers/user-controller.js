@@ -244,6 +244,14 @@ module.exports = {
                     },
                 })
 
+                //no stock reservation in this iteration of cart
+                await beverageModel.findByIdAndUpdate(lineItemExists.product, {
+                    $inc: {
+                        stock: -quantity,
+                    },
+                })
+
+
                 return res.status(200).json({ message: "item added to cart" });
             }
 
@@ -254,6 +262,13 @@ module.exports = {
                 product: mongoose.Types.ObjectId(`${beverageId}`),
                 quantity
             });
+
+            //deduct directly from stock. no reservation
+            await beverageModel.findByIdAndUpdate(lineItem.product, {
+                $inc: {
+                    stock: -quantity,
+                },
+            })
 
             //push line item to cart
             const user = await userModel.findByIdAndUpdate(userId, {
@@ -300,11 +315,24 @@ module.exports = {
 
         try {
             //populate with product price
-            const lineItem = await lineItemModel.findById(lineItemId)
+            const lineItem = await lineItemModel.findById(lineItemId).populate({
+                path: "product",
+                select: ['stock']
+            })
 
             if(!lineItem) {
                 return res.status(404).json({message: "line item not found"})
             }
+
+            let quantityStockDifference = quantity - lineItem.quantity
+
+            console.log(quantityStockDifference)
+
+            await beverageModel.findByIdAndUpdate(lineItem.product, {
+                $inc: {
+                    stock: - quantityStockDifference
+                }
+            })
 
             await lineItemModel.findByIdAndUpdate(lineItem, {
                 quantity,
@@ -323,8 +351,19 @@ module.exports = {
         const lineItemId = req.params.lineItemId
 
         try {
+
+            const lineItemToDelete = await lineItemModel.findById(lineItemId)
+
+
+            //add stock back to stock count
+            await beverageModel.findByIdAndUpdate(lineItemToDelete.product, {
+                $inc: {
+                    stock:lineItemToDelete.quantity
+                }
+            })
+
             //remove from lineItem collection
-            const lineItemToDelete = await lineItemModel.findByIdAndDelete(lineItemId)
+            await lineItemModel.findByIdAndDelete(lineItemId)
 
             if(!lineItemToDelete) {
                 return res.status(404).json({message: "line item not found"})
@@ -336,6 +375,7 @@ module.exports = {
                     cart: mongoose.Types.ObjectId(`${lineItemId}`)
                 }
             }) 
+
             res.status(200).json({ message: "Item removed from cart!" });
         } catch (error) {
             console.log(error);
@@ -377,16 +417,9 @@ module.exports = {
         // await lineItemModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }}, 
         // { $out: "purchaselineitems" }]);
 
-        let purchaseLineItems = await purchaseLineItemModel.find({user: mongoose.Types.ObjectId(`${userId}`)})
+        const purchaseLineItems = await purchaseLineItemModel.find({user: mongoose.Types.ObjectId(`${userId}`)})
 
-        purchaseLineItems.forEach( async lineItem => {
-            await beverageModel.findByIdAndUpdate(lineItem.product, {
-                $inc: {
-                    stock: -lineItem.quantity
-                }
-            })
-        })
-
+        
 
 
         res.json({message: "wow"})
