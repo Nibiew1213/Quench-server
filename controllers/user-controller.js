@@ -1,10 +1,13 @@
 const bcrypt = require("bcrypt");
-const userModel = require("../models/users-model");
+const mongoose = require("mongoose");
+
 const userValidator = require("../joi-validators/users");
 const cartValidator = require("../joi-validators/cart")
+
+const beverageModel = require("../models/beverages-model");
 const lineItemModel = require("../models/lineItems-model");
-const mongoose = require("mongoose");
-const Beverage = require("../models/beverages-model");
+const purchaseLineItemModel = require("../models/purchaseLineItems-model")
+const userModel = require("../models/users-model");
 
 module.exports = {
     register: async (req, res) => {
@@ -344,18 +347,57 @@ module.exports = {
     showCart: async (req, res) => {
         const userId = req.params.userId;
 
-        const userCart = await userModel.findById(userId, "-__v -userType -password").populate([{
-            path: "cart",
-            select: ['_id', 'quantity', 'totalSum'],
-            populate: {
-                path: 'product',
-                select: ['name', 'brandName', 'price', 'stock', 'spec', 'img']
+        try {
+            const userCart = await userModel.findById(userId, "-__v -userType -password").populate([{
+                path: "cart",
+                select: ['_id', 'quantity', 'totalSum'],
+                populate: {
+                    path: 'product',
+                    select: ['name', 'brandName', 'price', 'stock', 'spec', 'img']
+                }
+            }])
+    
+            
+            if (!userCart) {
+                res.status(404).json({message: "cart not found"})
             }
-        }])
+            res.status(200).json(userCart)
+            console.log(userCart)
+            
+        } catch (error) {
+            res.status(500).json({message: "unable to load cart"})
+        }
 
-        res.status(200).json(userCart)
-        console.log(userCart)
     },
+
+    purchase: async (req, res) => {
+        const userId = req.params.userId
+
+        // //copy cartLineItems to purchaseLineItems
+        // await lineItemModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }}, 
+        // { $out: "purchaselineitems" }]);
+
+        let purchaseLineItems = await purchaseLineItemModel.find({user: mongoose.Types.ObjectId(`${userId}`)})
+
+        purchaseLineItems.forEach( async lineItem => {
+            await beverageModel.findByIdAndUpdate(lineItem.product, {
+                $inc: {
+                    stock: -lineItem.quantity
+                }
+            })
+        })
+
+
+
+        res.json({message: "wow"})
+
+        //update beverage stock count
+        // await beverageModel
+
+    
+    }
+
+
 
 
     //await findbyid(userid).populate({path: 'cart'})
