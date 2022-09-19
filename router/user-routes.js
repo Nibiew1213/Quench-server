@@ -12,27 +12,27 @@ router.post('/auth/register', usersController.register)
 router.post('/auth/login', authController.login)
 
 // show user profile
-router.get('/profile/:_id', authMiddleware, usersController.showUser)
+router.get('/profile/:userId', authMiddleware, usersController.showUser)
 
 // edit user account
-router.put('/profile/:_id/editProfile', usersController.editProfile)
+router.put('/profile/:userId/editProfile', usersController.editProfile)
 
 // change user password
-router.put('/profile/:_id/changePassword', authController.changePassword)
+router.put('/profile/:userId/changePassword', authController.changePassword)
 
 // delete user account
-router.delete('/profile/:_id/deleteUser', usersController.deleteUser)
+router.delete('/profile/:userId/deleteUser', usersController.deleteUser)
 
 // add item to cart
-router.post('/:_id/cart', usersController.addToCart)
+router.post('/:userId/cart', usersController.addToCart)
 
 // update to cart
-router.patch('/:_id/cart/lineItem/:lineItemId', usersController.updateCart)
+router.patch('/:userId/cart/lineItem/:lineItemId', usersController.updateCart)
 
 // remove from cart
-router.delete('/:_id/cart/lineItem/:lineItemId', usersController.removeFromCart)
+router.delete('/:userId/cart/lineItem/:lineItemId', usersController.removeFromCart)
 
 // show cart
-router.get('/:_id/cart', usersController.showCart)
+router.get('/:userId/cart', usersController.showCart)
 
 module.exports = router

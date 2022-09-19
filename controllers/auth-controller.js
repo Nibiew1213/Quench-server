@@ -48,6 +48,7 @@ module.exports = {
       fullName: user.fullName,
       preferredName: user.preferredName,
       email: user.email,
+      userId: user._id,
     }
     const token = jwt.sign(
       {
@@ -57,9 +58,7 @@ module.exports = {
       process.env.JWT_SECRET
     )
 
-
-
-    return res.json({ token })
+    return res.json({ token, userData })
   },
 
   changePassword: async (req, res) => {

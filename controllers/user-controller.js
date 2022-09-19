@@ -52,67 +52,6 @@ module.exports = {
         }
     },
 
-    login: async (req, res) => {
-        // do validations ...
-        let errorObject = {};
-
-        const userValidationResults = userValidator.loginValidator.validate(
-            req.body,
-            {
-                abortEarly: false,
-            }
-        );
-
-        if (userValidationResults.error) {
-            const validationError = userValidationResults.error.details;
-
-            validationError.forEach((error) => {
-                errorObject[error.context.key] = error.message;
-            });
-
-            return res.status(400).json(errorObject);
-        }
-
-        const validatedUser = req.body;
-        let errMsg = "user email or password is incorrect";
-        let user = null;
-
-        try {
-            user = await userModel.findOne({ email: validatedUser.email });
-            if (!user) {
-                return res.status(401).json({ error: errMsg });
-            }
-        } catch (err) {
-            return res.status(500).json({ error: "failed to get user" });
-        }
-
-        const isPasswordOk = await bcrypt.compare(
-            req.body.password,
-            user.passwordgit
-        );
-
-        if (!isPasswordOk) {
-            return res.status(401).json({ error: errMsg });
-        }
-
-        // generate JWT and return as response
-        const userData = {
-            fullName: user.fullName,
-            preferredName: user.preferredName,
-            email: user.email,
-            id: user._id,
-        };
-        const token = jwt.sign(
-            {
-                exp: Math.floor(Date.now() / 1000) + 60 * 60, // 1 hour
-                data: userData,
-            },
-            process.env.JWT_SECRET
-        );
-
-        return res.json({ token, userData });
-    },
-
     showUser: async (req, res) => {
         let user = null;
         let userAuth = res.locals.userAuth;
@@ -121,8 +60,10 @@ module.exports = {
             return res.status(401).json({ message: "Not authorised." });
         }
 
+        const userId = req.params.userId
+        
         try {
-            user = await userModel.findOne({ email: userAuth.data.email });
+            user = await userModel.findbyId(userId);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
@@ -134,6 +75,7 @@ module.exports = {
             fullName: user.fullName,
             preferredName: user.preferredName,
             email: user.email,
+            userId: user._id
         };
 
         return res.json(userData);

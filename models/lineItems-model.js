@@ -26,3 +26,5 @@ const LineItemSchema = new mongoose.Schema(
 const LineItem = mongoose.model("LineItem", LineItemSchema);
 
 module.exports = LineItem;
+
+
