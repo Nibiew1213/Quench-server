@@ -5,8 +5,6 @@ const cartValidator = require("../joi-validators/cart");
 const beverageModel = require("../models/beverages-model");
 const cartModel = require("../models/carts-model");
 const lineItemModel = require("../models/lineItems-model");
-const purchaseModel = require("../models/purchases-model");
-const purchaseLineItemModel = require("../models/purchaseLineItems-model");
 const userModel = require("../models/users-model");
 
 module.exports = {
@@ -37,6 +35,7 @@ module.exports = {
             //check if user cart exists
             const userCart = await cartModel.findOne({
                 user: mongoose.Types.ObjectId(`${userId}`),
+                checkedOut: false
             });
 
             if (!userCart) {
@@ -46,6 +45,7 @@ module.exports = {
 
                 //check if line item already exists
                 const lineItemExists = await lineItemModel.findOne({
+                    cart: {$exists: false},
                     user: mongoose.Types.ObjectId(`${userId}`),
                     product: mongoose.Types.ObjectId(`${beverageId}`),
                 });
@@ -56,6 +56,7 @@ module.exports = {
                         $inc: {
                             quantity,
                         },
+                        cart: newCart._id
                     });
 
                     //no stock reservation in this iteration of cart
@@ -82,6 +83,7 @@ module.exports = {
                 if (!lineItemExists) {
                     //create line item
                     let lineItem = await lineItemModel.create({
+                        cart: mongoose.Types.ObjectId(`${newCart._id}`),
                         user: mongoose.Types.ObjectId(`${userId}`),
                         product: mongoose.Types.ObjectId(`${beverageId}`),
                         quantity,
@@ -110,6 +112,7 @@ module.exports = {
             if (userCart) {
                 //check if line item already exists
                 const lineItemExists = await lineItemModel.findOne({
+                    cart: userCart._id,
                     user: mongoose.Types.ObjectId(`${userId}`),
                     product: mongoose.Types.ObjectId(`${beverageId}`),
                 });
@@ -145,6 +148,7 @@ module.exports = {
                 if (!lineItemExists) {
                     //create line item
                     let lineItem = await lineItemModel.create({
+                        cart: userCart._id,
                         user: mongoose.Types.ObjectId(`${userId}`),
                         product: mongoose.Types.ObjectId(`${beverageId}`),
                         quantity,
@@ -258,7 +262,10 @@ module.exports = {
             }
 
             //remove lineItemId from cart array
-            await cartModel.findOneAndUpdate({user: mongoose.Types.ObjectId(`${userId}`)}, {
+            await cartModel.findOneAndUpdate({
+                user: mongoose.Types.ObjectId(`${userId}`),
+                checkedOut: false
+            }, {
                 $pull: {
                     lineItems: mongoose.Types.ObjectId(`${lineItemId}`),
                 },
@@ -277,7 +284,10 @@ module.exports = {
 
         try {
             const userCart = await cartModel
-                .findOne({user: mongoose.Types.ObjectId(`${userId}`)})
+                .findOne({
+                    user: mongoose.Types.ObjectId(`${userId}`),
+                    checkedOut: false
+                })
                 .populate([
                     {
                         path: "lineItems",
@@ -309,20 +319,37 @@ module.exports = {
     purchase: async (req, res) => {
         const userId = req.params.userId;
 
-        // //copy cartLineItems to purchaseLineItems
-        // await lineItemModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }},
-        // { $out: "purchaselineitems" }]);
+        try {
 
-        // await purchaseModel.create({
-        //     user: mongoose.Types.ObjectId(`${userId}`),
-        //     $set: {
-        //         purchases: [...purchaseLineItems]
-        //     }
-        // })
+            //convert cart to checked out
+            await cartModel.findOneAndUpdate({
+                user:  mongoose.Types.ObjectId(`${userId}`),
+                checkedOut: false
 
-        // res.json(purchaseLineItems)
+            }, {
+                checkedOut: true
+            })
 
-        //update beverage stock count
-        // await beverageModel
+            // //copy cartLineItems to purchaseLineItems
+            // await lineItemModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }},
+            // { $out: "purchaselineitems" }]);
+    
+            // //copy userCart to purchases
+            // await cartModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }},
+            // { $out: "purchases" }]);
+    
+            // //delete lineItems
+            // await lineItemModel.deleteMany({user:  mongoose.Types.ObjectId(`${userId}`)})
+    
+            // //delete cart
+            // await cartModel.deleteOne({user:  mongoose.Types.ObjectId(`${userId}`)})
+
+            res.status(200).json({message: "purchase complete!"})
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message: "unable to complete purchase"})
+        }
+
     },
 };
