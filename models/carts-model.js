@@ -12,6 +12,11 @@ const CartSchema = new mongoose.Schema(
                 ref: "LineItem",
                 unique: true
         }],
+        checkedOut: {
+            type: Boolean,
+            default: false,
+            required: true
+        }
   
     },
 

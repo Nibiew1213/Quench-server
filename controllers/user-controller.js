@@ -2,12 +2,6 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
 const userValidator = require("../joi-validators/users");
-const cartValidator = require("../joi-validators/cart")
-
-const beverageModel = require("../models/beverages-model");
-const lineItemModel = require("../models/lineItems-model");
-const purchaseModel = require("../models/purchases-model")
-const purchaseLineItemModel = require("../models/purchaseLineItems-model")
 const userModel = require("../models/users-model");
 
 module.exports = {
