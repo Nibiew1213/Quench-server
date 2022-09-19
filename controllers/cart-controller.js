@@ -276,12 +276,12 @@ module.exports = {
         const userId = req.params.userId;
 
         try {
-            const userCart = await userModel
-                .findById(userId, "-__v -userType -password")
+            const userCart = await cartModel
+                .findOne({user: mongoose.Types.ObjectId(`${userId}`)})
                 .populate([
                     {
-                        path: "cart",
-                        select: ["_id", "quantity", "totalSum"],
+                        path: "lineItems",
+                        select: ["_id", "quantity"],
                         populate: {
                             path: "product",
                             select: [
