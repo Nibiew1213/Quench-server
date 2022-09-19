@@ -1,9 +1,14 @@
 const bcrypt = require("bcrypt");
-const userModel = require("../models/users-model");
-const userValidator = require("../joi-validators/users");
-const lineItemModel = require("../models/lineItems-model");
 const mongoose = require("mongoose");
-const Beverage = require("../models/beverages-model");
+
+const userValidator = require("../joi-validators/users");
+const cartValidator = require("../joi-validators/cart")
+
+const beverageModel = require("../models/beverages-model");
+const lineItemModel = require("../models/lineItems-model");
+const purchaseModel = require("../models/purchases-model")
+const purchaseLineItemModel = require("../models/purchaseLineItems-model")
+const userModel = require("../models/users-model");
 
 module.exports = {
     register: async (req, res) => {
@@ -103,7 +108,7 @@ module.exports = {
             return res.status(400).json(errorObject);
         }
 
-        let userId = req.params._id;
+        let userId = req.params.userId;
         let user = null;
 
         try {
@@ -128,7 +133,7 @@ module.exports = {
 
     deleteUser: async (req, res) => {
         try {
-            let userId = req.params._id;
+            let userId = req.params.userId;
 
             let userToDelete = await userModel.findByIdAndDelete(userId);
 
@@ -140,101 +145,6 @@ module.exports = {
         } catch (error) {
             res.status(500).json({ error: "failed to delete user" });
         }
-    },
+    }
 
-    addToCart: async (req, res) => {
-        const userId = req.params._id;
-        const beverageId = req.body.beverageId;
-        const quantity = req.body.quantity;
-
-        try {
-            //check if line item already exists
-            let lineItemExists = await lineItemModel.findOne({
-                user: mongoose.Types.ObjectId(`${userId}`),
-                product: mongoose.Types.ObjectId(`${beverageId}`),
-            })
-
-            //if exists, update quantity instead
-            if(lineItemExists) {
-                await lineItemModel.findByIdAndUpdate(lineItemExists._id,{
-                    $inc: {
-                        quantity
-                    }
-                })
-
-                return res.status(200).json({ message: "item added to cart" });
-            }
-
-
-            //create line item
-            let lineItem = await lineItemModel.create({
-                user: mongoose.Types.ObjectId(`${userId}`),
-                product: mongoose.Types.ObjectId(`${beverageId}`),
-                quantity
-            });
-
-            //push line item to cart
-            const user = await userModel.findByIdAndUpdate(userId, {
-                $push: {
-                    cart: lineItem._id,
-                },
-            });
-
-            if (!user) {
-                return res.status(404).json({ message: "user not found" });
-            }
-
-            return res.status(200).json({ message: "item added to cart" });
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({ message: "unable to add item to cart!" });
-        }
-    },
-
-    //edit item in cart
-    updateCart: async (req, res) => {
-        const lineItemId = req.params.lineItemId
-        const quantity = req.body.quantity;
-
-        try {
-            await lineItemModel.findByIdAndUpdate(lineItemId, {
-                quantity
-            })
-
-            res.status(200).json({ message: "cart updated" });
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ message: "unable to update cart!" });
-        }
-    },
-
-    //remove from cart
-    removeFromCart: async (req, res) => {
-        const userId = req.params._id;
-        const lineItemId = req.params.lineItemId
-
-        try {
-            //remove from lineItem collection
-            await lineItemModel.findByIdAndDelete(lineItemId)
-
-            //remove lineItemId from cart array
-            await userModel.findByIdAndUpdate(userId, {
-                $pull: {
-                    cart: mongoose.Types.ObjectId(`${lineItemId}`)
-                }
-            }) 
-            res.status(200).json({ message: "Item removed from cart!" });
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ message: "unable remove item from cart!" });
-        }
-    },
-
-    //show cart
-    showCart: async (req, res) => {
-        res.send("wow this is ur whole cart")
-    },
-
-
-    //await findbyid(userid).populate({path: 'cart'})
-};
+    };

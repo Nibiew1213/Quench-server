@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const LineItemSchema = new mongoose.Schema(
+const PurchaseLineItemSchema = new mongoose.Schema(
     {
         user: {
             type: Schema.Types.ObjectId,
@@ -22,8 +22,6 @@ const LineItemSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const LineItem = mongoose.model("LineItem", LineItemSchema);
+const PurchaseLineItem = mongoose.model("PurchaseLineItem", PurchaseLineItemSchema);
 
-module.exports = LineItem;
-
-
+module.exports = PurchaseLineItem;
