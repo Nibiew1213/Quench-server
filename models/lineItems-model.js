@@ -3,6 +3,10 @@ const { Schema } = mongoose;
 
 const LineItemSchema = new mongoose.Schema(
     {
+        cart: {
+            type: Schema.Types.ObjectId,
+            ref: "Cart",
+        },
         user: {
             type: Schema.Types.ObjectId,
             ref: "Users",
@@ -25,3 +29,5 @@ const LineItemSchema = new mongoose.Schema(
 const LineItem = mongoose.model("LineItem", LineItemSchema);
 
 module.exports = LineItem;
+
+
