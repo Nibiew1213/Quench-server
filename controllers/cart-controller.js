@@ -15,9 +15,7 @@ module.exports = {
         const beverageId = req.body.beverageId;
         const quantity = req.body.quantity;
 
-
         try {
-
             //validation
             let errorObject = {};
 
@@ -35,14 +33,13 @@ module.exports = {
 
                 return res.status(400).json(errorObject);
             }
-           
 
             //check if user cart exists
-            const userCart = await cartModel.findOne(
-                { user: mongoose.Types.ObjectId(`${userId}`) }
-            );
+            const userCart = await cartModel.findOne({
+                user: mongoose.Types.ObjectId(`${userId}`),
+            });
 
-            if(!userCart) {
+            if (!userCart) {
                 const newCart = await cartModel.create({
                     user: mongoose.Types.ObjectId(`${userId}`),
                 });
@@ -62,24 +59,27 @@ module.exports = {
                     });
 
                     //no stock reservation in this iteration of cart
-                    await beverageModel.findByIdAndUpdate(lineItemExists.product, {
-                        $inc: {
-                            stock: -quantity,
-                        },
-                    });
+                    await beverageModel.findByIdAndUpdate(
+                        lineItemExists.product,
+                        {
+                            $inc: {
+                                stock: -quantity,
+                            },
+                        }
+                    );
 
                     await cartModel.findByIdAndUpdate(newCart._id, {
                         $addToSet: {
-                            lineItems: mongoose.Types.ObjectId(lineItemExists)
-                        }
-                    })
+                            lineItems: mongoose.Types.ObjectId(lineItemExists),
+                        },
+                    });
 
-                    return res.status(200).json({ message: "item added to cart" });
-
+                    return res
+                        .status(200)
+                        .json({ message: "item added to cart" });
                 }
 
-                if(!lineItemExists) {
-
+                if (!lineItemExists) {
                     //create line item
                     let lineItem = await lineItemModel.create({
                         user: mongoose.Types.ObjectId(`${userId}`),
@@ -90,10 +90,10 @@ module.exports = {
                     // push to cart
                     await cartModel.findByIdAndUpdate(newCart._id, {
                         $addToSet: {
-                            lineItems: mongoose.Types.ObjectId(lineItem)
-                        }
-                    })
-                
+                            lineItems: mongoose.Types.ObjectId(lineItem),
+                        },
+                    });
+
                     //deduct directly from stock. no reservation
                     await beverageModel.findByIdAndUpdate(lineItem.product, {
                         $inc: {
@@ -101,73 +101,74 @@ module.exports = {
                         },
                     });
 
-                    return res.status(200).json({ message: "item added to cart" });
+                    return res
+                        .status(200)
+                        .json({ message: "item added to cart" });
                 }
-
-
             }
 
-            if(userCart) {
-
+            if (userCart) {
                 //check if line item already exists
                 const lineItemExists = await lineItemModel.findOne({
                     user: mongoose.Types.ObjectId(`${userId}`),
                     product: mongoose.Types.ObjectId(`${beverageId}`),
                 });
-    
+
                 if (lineItemExists) {
                     await lineItemModel.findByIdAndUpdate(lineItemExists._id, {
                         $inc: {
                             quantity,
                         },
                     });
-    
+
                     //no stock reservation in this iteration of cart
-                    await beverageModel.findByIdAndUpdate(lineItemExists.product, {
-                        $inc: {
-                            stock: -quantity,
-                        },
-                    });
-    
+                    await beverageModel.findByIdAndUpdate(
+                        lineItemExists.product,
+                        {
+                            $inc: {
+                                stock: -quantity,
+                            },
+                        }
+                    );
+
                     await cartModel.findByIdAndUpdate(userCart._id, {
                         $addToSet: {
-                            lineItems: mongoose.Types.ObjectId(lineItemExists)
-                        }
-                    })
-    
-    
-                    return res.status(200).json({ message: "item added to cart" });
-    
+                            lineItems: mongoose.Types.ObjectId(lineItemExists),
+                        },
+                    });
+
+                    return res
+                        .status(200)
+                        .json({ message: "item added to cart" });
                 }
-    
-                if(!lineItemExists) {
-    
+
+                if (!lineItemExists) {
                     //create line item
                     let lineItem = await lineItemModel.create({
                         user: mongoose.Types.ObjectId(`${userId}`),
                         product: mongoose.Types.ObjectId(`${beverageId}`),
                         quantity,
                     });
-    
+
                     // push to cart
                     await cartModel.findByIdAndUpdate(userCart._id, {
                         $addToSet: {
-                            lineItems: mongoose.Types.ObjectId(lineItem)
-                        }
-                    })
-                
+                            lineItems: mongoose.Types.ObjectId(lineItem),
+                        },
+                    });
+
                     //deduct directly from stock. no reservation
                     await beverageModel.findByIdAndUpdate(lineItem.product, {
                         $inc: {
                             stock: -quantity,
                         },
                     });
-    
-                    return res.status(200).json({ message: "item added to cart" });
-            }
 
+                    return res
+                        .status(200)
+                        .json({ message: "item added to cart" });
+                }
             }
-
         } catch (error) {
             console.log(error);
             return res
@@ -237,7 +238,10 @@ module.exports = {
         const lineItemId = req.params.lineItemId;
 
         try {
-            const lineItemToDelete = await lineItemModel.findById(lineItemId);
+            const lineItemToDelete = await lineItemModel.findById(lineItemId).populate({
+                path: "product",
+                select: ["stock"],
+            });
 
             //add stock back to stock count
             await beverageModel.findByIdAndUpdate(lineItemToDelete.product, {
@@ -254,9 +258,9 @@ module.exports = {
             }
 
             //remove lineItemId from cart array
-            await userModel.findByIdAndUpdate(userId, {
+            await cartModel.findOneAndUpdate({user: mongoose.Types.ObjectId(`${userId}`)}, {
                 $pull: {
-                    cart: mongoose.Types.ObjectId(`${lineItemId}`),
+                    lineItems: mongoose.Types.ObjectId(`${lineItemId}`),
                 },
             });
 
