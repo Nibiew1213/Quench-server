@@ -65,24 +65,23 @@ module.exports = {
             return res.status(401).json({ message: "Not authorised." });
         }
 
-        const userId = req.params.userId
+        let userId = req.params.userId
         
         try {
-            user = await userModel.findbyId(userId);
+            user = await userModel.findById(userId);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
         } catch (err) {
+            console.log(err)
             return res.status(500).json({ error: "failed to get user" });
         }
-
         const userData = {
             fullName: user.fullName,
             preferredName: user.preferredName,
             email: user.email,
             userId: user._id
         };
-
         return res.json(userData);
     },
 
@@ -112,7 +111,7 @@ module.exports = {
         let user = null;
 
         try {
-            user = await userModel.findById(userId);
+            user = await userModel.findById(userId); 
         } catch (error) {
             return res
                 .status(500)
