@@ -102,25 +102,25 @@ module.exports = {
         }
 
         let userId = req.params.userId;
-        let user = null;
 
         try {
-            user = await userModel.findById(userId); 
+            const user = await userModel.findById(userId); 
+            if (!user) {
+                return res.status(404).json(user);
+            }
         } catch (error) {
             return res
                 .status(500)
                 .json({ error: `Failed to get user of id: ${userId}` });
         }
 
-        if (!user) {
-            return res.status(404).json(user);
-        }
-
         try {
-            await user.updateOne(req.body);
-            res.status(201).json({ message: "profile updated!" });
+            console.log(req.body);
+            // const response = await user.updateOne(req.body);
+            const response = await userModel.findByIdAndUpdate(userId, {$set: req.body}, {new: true})
+            res.status(201).json({ message: "profile updated!", newData: response });
         } catch (error) {
-            res.status(500).json({ error: "failed to update user" });
+            res.status(500).json({ error: error.message });
         }
     },
 
