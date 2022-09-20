@@ -1,23 +1,23 @@
-const express = require('express')
-const favouriteController = require('../controllers/favourite-controller')
+// const express = require('express')
+// const favouriteController = require('../controllers/favourite-controller')
 
-const router = express.Router()
+// const router = express.Router()
 
-//fetch beverages
-router.get('/', beverageController.fetchBeverages)
+// //fetch favourites
+// router.get('/', favouriteController.fetchBeverages)
 
-//show beverage
-router.get('/:beverageId', beverageController.showBeverage)
+// //show favourite
+// router.get('/:beverageId', favouriteController.showBeverage)
 
-//create beverage
-router.post('/', beverageController.createBeverage)
+// //create favourite
+// router.post('/', favouriteController.createBeverage)
 
-//edit beverage
-router.put('/:beverageId', beverageController.editBeverage)
+// //edit favourite
+// router.put('/:beverageId', favouriteController.editBeverage)
 
-//delete beverage
-router.delete('/:beverageId', beverageController.deleteBeverage)
+// //delete favourite
+// router.delete('/:beverageId', favouriteController.deleteBeverage)
 
 
 
-module.exports = router
+// module.exports = router

@@ -2,6 +2,7 @@ const express = require('express')
 const authController = require('../controllers/auth-controller')
 const cartController = require('../controllers/cart-controller')
 const usersController = require('../controllers/user-controller')
+const favouriteController = require('../controllers/favourite-controller')
 
 const authMiddleware = require('../middlewares/authmiddleware')
 
@@ -40,5 +41,19 @@ router.get('/:userId/cart', cartController.showCart)
 // purchase items
 router.post('/:userId/cart/purchase', cartController.purchase)
 
+// //fetch favourites
+router.get('/:userId/favourite', favouriteController.fetchFavourites)
+
+//create favourite beverage
+router.post('/:userId/favourite', favouriteController.createFavourite)
+
+//delete favourite beverage
+router.delete('/:userId/favourite/:beverageId', favouriteController.deleteFavourite)
+
+//show favourite beverage
+router.get('/:userId/favourite/:beverageId', favouriteController.showFavourite)
+
+// //edit favourite
+// router.put('/:beverageId', favouriteController.editBeverage)
 
 module.exports = router
