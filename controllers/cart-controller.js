@@ -316,7 +316,7 @@ module.exports = {
         }
     },
 
-    purchase: async (req, res) => {
+    checkout: async (req, res) => {
         const userId = req.params.userId;
 
         try {
