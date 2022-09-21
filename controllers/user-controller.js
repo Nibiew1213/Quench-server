@@ -118,7 +118,13 @@ module.exports = {
             console.log(req.body);
             // const response = await user.updateOne(req.body);
             const response = await userModel.findByIdAndUpdate(userId, {$set: req.body}, {new: true})
-            res.status(201).json({ message: "profile updated!", newData: response });
+            const newUserData = {
+                fullName: response.fullName,
+                preferredName: response.preferredName,
+                email: response.email,
+                userId: response._id
+            }
+            res.status(201).json({ message: "profile updated!", newData: newUserData});
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
