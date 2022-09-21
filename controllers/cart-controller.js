@@ -59,7 +59,7 @@ module.exports = {
                         cart: newCart._id
                     });
 
-                    //no stock reservation in this iteration of cart
+                    //sort of stock reservation in this iteration of cart
                     await beverageModel.findByIdAndUpdate(
                         lineItemExists.product,
                         {
@@ -330,19 +330,9 @@ module.exports = {
                 checkedOut: true
             })
 
-            // //copy cartLineItems to purchaseLineItems
-            // await lineItemModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }},
-            // { $out: "purchaselineitems" }]);
-    
-            // //copy userCart to purchases
-            // await cartModel.aggregate([ { $match: {user:  mongoose.Types.ObjectId(`${userId}`) }},
-            // { $out: "purchases" }]);
-    
-            // //delete lineItems
-            // await lineItemModel.deleteMany({user:  mongoose.Types.ObjectId(`${userId}`)})
-    
-            // //delete cart
-            // await cartModel.deleteOne({user:  mongoose.Types.ObjectId(`${userId}`)})
+            await cartModel.create({
+                user: mongoose.Types.ObjectId(`${userId}`),
+            });
 
             res.status(200).json({message: "purchase complete!"})
             
