@@ -5,49 +5,29 @@ const favouriteValidator = require("../joi-validators/favourites");
 module.exports = {
     
     fetchFavourites: async (req, res) => {
-        let allfavourites = [];
-
         try {
-            allfavourites = await favouriteModel.find();
+            const allfavourites = await favouriteModel.find().populate('product', 'name brandName price description spec img');
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: "unable to fetch favourites" });
         }
-
         return res.json(allfavourites);
     },
 
-    showFavourite: async (req, res) => {
-        let beverageId = req.params.beverageId;
-
-        try {
-            const beverage = await favouriteModel.findById(beverageId);
-
-            if (!beverage) {
-                return res.status(404).json();
-            }
-
-            return res.json(beverage);
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: "unable to fetch favourite beverage" });
-        }
-    },
-
     createFavourite: async (req, res) => {
-        // res.send("created beverage")
+        // res.send("created favourite beverage")
 
         let errorObject = {};
 
-        //validate beverage values
-        const beverageValidationResults =
+        //validate favourite beverage values
+        const favouriteValidationResults =
             favouriteValidator.favouriteValidator.validate(req.body, {
                 abortEarly: false,
             });
 
         //return joi validation error messages, if any
-        if (beverageValidationResults.error) {
-            const validationError = beverageValidationResults.error.details;
+        if (favouriteValidationResults.error) {
+            const validationError = favouriteValidationResults.error.details;
 
             validationError.forEach((error) => {
                 errorObject[error.context.key] = error.message;
@@ -56,14 +36,14 @@ module.exports = {
             return res.status(400).json(errorObject);
         }
 
-        let validatedbeverage = beverageValidationResults;
+        let validatedfavourite = favouriteValidationResults;
 
         try {
-            validatedbeverage = await favouriteModel.findOne({
+            validatedfavourite = await favouriteModel.findOne({
                 name: validatedbeverage.name,
             });
 
-            if (validatedbeverage) {
+            if (validatedfavourite) {
                 return res.status(409).json({ error: "favourite beverage exists" });
             }
 
@@ -73,14 +53,14 @@ module.exports = {
             return res.status(500).json({ error: "failed to get favourite beverage" });
         }
 
-        const beverage = req.body;
+        const favourite = req.body;
 
         try {
-            await favouriteModel.create(beverage);
-            return res.status(201).json({ success: "beverage created" });
+            await favouriteModel.create(favourite).populate('product', 'name brandName price description spec img');
+            return res.status(201).json({ success: "favourite beverage created" });
         } catch (error) {
             console.log(error);
-            return res.status(500).json({ error: "failed to create beverage" });
+            return res.status(500).json({ error: "failed to create favourite beverage" });
         }
 
         return res.json();
@@ -88,62 +68,14 @@ module.exports = {
 
     deleteFavourite: async (req, res) => {
         try {
-            let beverageId = req.params.beverageId;
+            let favouriteId = req.params.favouriteId;
 
-            await favouriteModel.findByIdAndDelete(beverageId);
+            await favouriteModel.findByIdAndDelete(favouriteId);
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: "failed to delete favourite beverage" });
         }
-
         return res.status(201).json();
     },
-
-
-
-    // editBeverage: async (req, res) => {
-    //     let errorObject = {};
-
-    //     //validate beverage values
-    //     const beverageValidationResults =
-    //         favouriteValidator.favouriteValidator.validate(req.body, {
-    //             abortEarly: false,
-    //         });
-
-    //     //return joi validation error messages, if any
-    //     if (beverageValidationResults.error) {
-    //         const validationError = beverageValidationResults.error.details;
-
-    //         validationError.forEach((error) => {
-    //             errorObject[error.context.key] = error.message;
-    //         });
-
-    //         return res.status(400).json(errorObject);
-    //     }
-
-    //     let beverageId = req.params.beverageId;
-
-    //     let beverage = null;
-
-    //     try {
-    //         beverage = await favouriteModel.findById(beverageId);
-    //     } catch (error) {
-    //         return res
-    //             .status(500)
-    //             .json({ error: `Failed to get beverage of id: ${beverageId}` });
-    //     }
-
-    //     if (!beverage) {
-    //         return res.status(404).json(beverage);
-    //     }
-
-    //     try {
-    //         await beverage.updateOne(req.body);
-    //     } catch (error) {
-    //         return res.status(500).json({ error: "failed to update beverage" });
-    //     }
-
-    //     return res.status(201).json();
-    // },
 
 };

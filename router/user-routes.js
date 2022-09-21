@@ -50,8 +50,8 @@ router.post('/:userId/favourite', favouriteController.createFavourite)
 //delete favourite beverage
 router.delete('/:userId/favourite/:beverageId', favouriteController.deleteFavourite)
 
-//show favourite beverage
-router.get('/:userId/favourite/:beverageId', favouriteController.showFavourite)
+// //show favourite beverage
+// router.get('/:userId/favourite/:beverageId', favouriteController.showFavourite)
 
 // //edit favourite
 // router.put('/:beverageId', favouriteController.editBeverage)
