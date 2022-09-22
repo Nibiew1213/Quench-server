@@ -13,12 +13,6 @@ module.exports = {
         const beverageId = req.body.beverageId;
         const quantity = req.body.quantity;
 
-        let userAuth = res.locals.userAuth;
-
-        if (!userAuth) {
-            return res.status(401).json({ message: "Not authorised." });
-        }
-
         try {
             //validation
             let errorObject = {};
@@ -192,12 +186,6 @@ module.exports = {
         const lineItemId = req.params.lineItemId;
         const quantity = req.body.quantity;
 
-        let userAuth = res.locals.userAuth;
-
-        if (!userAuth) {
-            return res.status(401).json({ message: "Not authorised." });
-        }
-
         //validation
         let errorObject = {};
 
@@ -250,11 +238,7 @@ module.exports = {
 
     //remove from cart
     removeFromCart: async (req, res) => {
-        let userAuth = res.locals.userAuth;
 
-        if (!userAuth) {
-            return res.status(401).json({ message: "Not authorised." });
-        }
         const userId = req.params.userId;
         const lineItemId = req.params.lineItemId;
 
@@ -297,11 +281,6 @@ module.exports = {
 
     //show cart
     showCart: async (req, res) => {
-        let userAuth = res.locals.userAuth;
-
-        if (!userAuth) {
-            return res.status(401).json({ message: "Not authorised." });
-        }
 
         const userId = req.params.userId;
 
@@ -340,11 +319,6 @@ module.exports = {
     },
 
     checkout: async (req, res) => {
-        let userAuth = res.locals.userAuth;
-
-        if (!userAuth) {
-            return res.status(401).json({ message: "Not authorised." });
-        }
 
         const userId = req.params.userId;
 
