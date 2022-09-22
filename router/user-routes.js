@@ -38,7 +38,7 @@ router.delete('/:userId/cart/lineItem/:lineItemId', cartController.removeFromCar
 router.get('/:userId/cart', cartController.showCart)
 
 // purchase items
-router.post('/:userId/cart/purchase', cartController.purchase)
+router.post('/:userId/cart/checkout', cartController.checkout)
 
 
 module.exports = router
