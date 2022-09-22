@@ -80,6 +80,12 @@ module.exports = {
     },
 
     editProfile: async (req, res) => {
+        let userAuth = res.locals.userAuth;
+
+        if (!userAuth) {
+            return res.status(401).json({ message: "Not authorised." });
+        }
+
         let errorObject = {};
 
         //validate user values
@@ -131,6 +137,12 @@ module.exports = {
     },
 
     deleteUser: async (req, res) => {
+        let userAuth = res.locals.userAuth;
+
+        if (!userAuth) {
+            return res.status(401).json({ message: "Not authorised." });
+        }
+
         try {
             let userId = req.params.userId;
 
