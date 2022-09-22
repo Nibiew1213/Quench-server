@@ -7,7 +7,7 @@ const beverageRouter = require('./router/beverage-routes')
 const userRouter = require('./router/user-routes')
 
 const app = express();
-const port = process.env.port || 8000;
+const port = process.env.PORT || 8000;
 const mongoConnectionStr = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PW}@${process.env.MONGO_HOST}?retryWrites=true&w=majority`;
 
 app.use(express.urlencoded({ extended: true }));
